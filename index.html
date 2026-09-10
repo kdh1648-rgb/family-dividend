@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F7A5C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="우리가족배당금">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="가족과 함께 배당금을 기록하고 성장을 추이를 확인하세요">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" href="./icons/icon-192.png">
+<title>우리가족 배당금</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+  padding-bottom: 120px;
+}
+
+header {
+  background: linear-gradient(135deg, #1F7A5C 0%, #2d9f75 100%);
+  color: white;
+  padding: 24px 16px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+header h1 {
+  font-size: 24px;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+header p {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+button {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-white {
+  background: white;
+  color: #1F7A5C;
+}
+
+.btn-white:active {
+  opacity: 0.8;
+}
+
+.section {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.section-title {
+  font-size: 13px;
+  color: #999;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1F7A5C;
+}
+
+.month-select {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+select {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.change-text {
+  font-size: 12px;
+  color: #999;
+  margin-top: 6px;
+}
+
+.member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.member-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1F7A5C, #2d9f75);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.member-info {
+  flex: 1;
+}
+
+.member-name {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.member-amount-input {
+  width: 70px;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 12px;
+  text-align: right;
+}
+
+.btn-del {
+  background: #fee;
+  color: #c33;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.btn-del:active {
+  opacity: 0.7;
+}
+
+.btn-add {
+  background: #1F7A5C;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.btn-add:active {
+  opacity: 0.8;
+}
+
+canvas {
+  width: 100%;
+  height: 200px;
+  margin-top: 12px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 13px;
+}
+
+.save-btn {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, #1F7A5C, #2d9f75);
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(31, 122, 92, 0.3);
+  max-width: 568px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.save-btn:active {
+  transform: scale(0.98);
+}
+
+.photo-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.photo-modal.active {
+  display: flex;
+}
+
+.photo-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.photo-preview {
+  width: 100%;
+  height: 150px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.modal-btn-primary {
+  background: #1F7A5C;
+  color: white;
+}
+
+.modal-btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>💰 우리가족 배당금</h1>
+    <p>가족과 함께 배당금을 기록하고 성장을 추이를 확인하세요</p>
+    <div class="button-group">
+      <button class="btn-white" onclick="backup()">📤 백업</button>
+      <button class="btn-white" onclick="restore()">📥 복원</button>
+    </div>
+  </header>
+
+  <div class="section">
+    <div class="section-title">📅 조회 기간</div>
+    <div class="month-select">
+      <select id="yearSelect" onchange="handleDateChange()"></select>
+      <select id="monthSelect" onchange="handleDateChange()"></select>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">선택한 달 가족 총 배당금</div>
+    <div class="stat-value" id="monthTotal">0원</div>
+    <div class="change-text" id="changeText">전월 대비 0원</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="section">
+      <div class="section-title">📊 올해 누적</div>
+      <div class="stat-value" id="yearTotal">0원</div>
+    </div>
+    <div class="section">
+      <div class="section-title">👥 등록 가족</div>
+      <div class="stat-value" id="memberCount">0명</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">👨‍👩‍👧‍👦 이번 달 배당금</div>
+    <div class="member-list" id="memberList"></div>
+    <button class="btn-add" onclick="addMember()">+ 가족 추가</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📈 월별 배당금 추이</div>
+    <small style="color: #999;">가족별 + 총액</small>
+    <canvas id="chart"></canvas>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">💾 데이터 관리</div>
+    <p style="font-size:12px; color:#666; margin-bottom:12px;">백업 파일에는 가족 목록과 지금까지 입력한 모든 배당금 기록이 저장됩니다. 폰을 바꿀 때 <strong>백업 → 복원</strong>으로 그대로 옮길 수 있습니다.</p>
+  </div>
+</div>
+
+<button class="save-btn" onclick="save()">💾 저장하기</button>
+
+<div id="photoModal" class="photo-modal">
+  <div class="photo-modal-content">
+    <div style="font-size:14px; font-weight:700; margin-bottom:12px;">📷 사진 선택</div>
+    <div class="photo-preview" id="photoPreview">📸</div>
+    <div class="modal-buttons">
+      <button class="modal-btn modal-btn-primary" onclick="selectPhoto()">사진 선택</button>
+      <button class="modal-btn modal-btn-secondary" onclick="deletePhoto()">삭제</button>
+    </div>
+    <div class="modal-buttons" style="margin-top:8px;">
+      <button class="modal-btn modal-btn-secondary" onclick="closePhotoModal()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="photoInput" accept="image/*" onchange="handlePhotoSelect()">
+<input type="file" id="restoreFile" accept=".json" onchange="handleRestore()">
+
+<script>
+const KEY = 'familyDividendData';
+let db = JSON.parse(localStorage.getItem(KEY) || 'null') || {
+  members: ['나', '배우자'],
+  photos: {},
+  data: {}
+};
+
+let currentYear = new Date().getFullYear();
+let currentMonth = new Date().getMonth() + 1;
+let currentPhotoMember = '';
+
+function monthKey(year, month) {
+  return year + '-' + String(month).padStart(2, '0');
+}
+
+function init() {
+  initDateSelects();
+  render();
+}
+
+function initDateSelects() {
+  const yearSelect = document.getElementById('yearSelect');
+  const monthSelect = document.getElementById('monthSelect');
+  
+  // 연도 옵션
+  for (let y = currentYear - 2; y <= currentYear + 3; y++) {
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y + '년';
+    yearSelect.appendChild(opt);
+  }
+  
+  // 월 옵션
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = m + '월';
+    monthSelect.appendChild(opt);
+  }
+  
+  yearSelect.value = currentYear;
+  monthSelect.value = currentMonth;
+}
+
+function handleDateChange() {
+  currentYear = Number(document.getElementById('yearSelect').value);
+  currentMonth = Number(document.getElementById('monthSelect').value);
+  render();
+}
+
+function render() {
+  renderMembers();
+  updateStats();
+  draw();
+}
+
+function renderMembers() {
+  const monthData = db.data[monthKey(currentYear, currentMonth)] || {};
+  const html = db.members.map((name, i) => {
+    const photo = db.photos[name];
+    return `
+      <div class="member-item">
+        <div class="member-avatar" onclick="openPhotoModal('${name}')" style="cursor:pointer;">
+          ${photo ? '<img src="' + photo + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">' : name[0]}
+        </div>
+        <div class="member-info">
+          <div class="member-name">${name}</div>
+        </div>
+        <input type="number" class="member-amount-input" id="div-${i}" value="${monthData[name] || 0}" placeholder="0">
+        <button class="btn-del" onclick="deleteMember(${i})">×</button>
+      </div>
+    `;
+  }).join('');
+  
+  document.getElementById('memberList').innerHTML = html || '<div class="empty-state">가족을 추가해보세요</div>';
+}
+
+function updateStats() {
+  const monthData = db.data[monthKey(currentYear, currentMonth)] || {};
+  const monthTotal = Object.values(monthData).reduce((a, b) => a + (Number(b) || 0), 0);
+  
+  let yearTotal = 0;
+  for (let m = 1; m <= 12; m++) {
+    const data = db.data[monthKey(currentYear, m)] || {};
+    yearTotal += Object.values(data).reduce((a, b) => a + (Number(b) || 0), 0);
+  }
+  
+  const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+  const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+  const prevData = db.data[monthKey(prevYear, prevMonth)] || {};
+  const prevTotal = Object.values(prevData).reduce((a, b) => a + (Number(b) || 0), 0);
+  const change = monthTotal - prevTotal;
+  
+  document.getElementById('monthTotal').textContent = monthTotal.toLocaleString('ko-KR') + '원';
+  document.getElementById('yearTotal').textContent = yearTotal.toLocaleString('ko-KR') + '원';
+  document.getElementById('memberCount').textContent = db.members.length + '명';
+  document.getElementById('changeText').textContent = '전월 대비 ' + (change >= 0 ? '⬆ ' : '⬇ ') + Math.abs(change).toLocaleString('ko-KR') + '원';
+}
+
+function draw() {
+  const canvas = document.getElementById('chart');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const dpr = devicePixelRatio || 1;
+  const w = canvas.clientWidth;
+  const h = 200;
+  
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+  
+  const months = Array.from({length: 12}, (_, i) => i + 1);
+  const series = [...db.members, '가족 총액'];
+  const data = series.map(name => 
+    months.map(m => {
+      if (name === '가족 총액') {
+        const d = db.data[monthKey(currentYear, m)] || {};
+        return Object.values(d).reduce((a, b) => a + (Number(b) || 0), 0);
+      } else {
+        return Number((db.data[monthKey(currentYear, m)] || {})[name] || 0);
+      }
+    })
+  );
+  
+  const max = Math.max(1, ...data.flat());
+  const L = 50, R = 15, T = 20, B = 35;
+  const cw = w - L - R, ch = h - T - B;
+  
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 1;
+  ctx.font = '12px -apple-system';
+  ctx.fillStyle = '#999';
+  
+  for (let j = 0; j <= 4; j++) {
+    const y = T + ch * j / 4;
+    ctx.beginPath();
+    ctx.moveTo(L, y);
+    ctx.lineTo(w - R, y);
+    ctx.stroke();
+    const val = Math.round(max * (1 - j / 4));
+    ctx.fillText(val.toLocaleString('ko-KR'), 4, y + 4);
+  }
+  
+  const colors = ['#6366f1', '#f59e0b', '#10b981', '#d946ef', '#0f172a'];
+  
+  series.forEach((name, si) => {
+    ctx.strokeStyle = colors[si % colors.length];
+    ctx.lineWidth = name === '가족 총액' ? 3 : 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    
+    data[si].forEach((v, i) => {
+      const x = L + cw * i / 11;
+      const y = T + ch * (1 - v / max);
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    });
+    ctx.stroke();
+    
+    data[si].forEach((v, i) => {
+      const x = L + cw * i / 11;
+      const y = T + ch * (1 - v / max);
+      ctx.fillStyle = colors[si % colors.length];
+      ctx.beginPath();
+      ctx.arc(x, y, name === '가족 총액' ? 3.5 : 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  });
+  
+  ctx.fillStyle = '#666';
+  ctx.font = '11px -apple-system';
+  months.forEach((m, i) => {
+    ctx.fillText(m + '월', L + cw * i / 11 - 6, h - 8);
+  });
+  
+  const legendHtml = series.map((s, i) => 
+    `<div class="legend-item"><div class="legend-dot" style="background:${colors[i % colors.length]}"></div>${s}</div>`
+  ).join('');
+  document.getElementById('legend').innerHTML = legendHtml;
+}
+
+function save() {
+  const monthData = {};
+  db.members.forEach((name, i) => {
+    monthData[name] = Number(document.getElementById('div-' + i).value) || 0;
+  });
+  db.data[monthKey(currentYear, currentMonth)] = monthData;
+  localStorage.setItem(KEY, JSON.stringify(db));
+  alert('✅ 저장되었습니다!');
+  render();
+}
+
+function addMember() {
+  const name = prompt('가족 이름을 입력하세요:');
+  if (name && name.trim()) {
+    db.members.push(name.trim());
+    localStorage.setItem(KEY, JSON.stringify(db));
+    render();
+  }
+}
+
+function deleteMember(i) {
+  if (confirm(db.members[i] + '을(를) 삭제하시겠어요?')) {
+    const name = db.members[i];
+    delete db.photos[name];
+    db.members.splice(i, 1);
+    localStorage.setItem(KEY, JSON.stringify(db));
+    render();
+  }
+}
+
+function openPhotoModal(name) {
+  currentPhotoMember = name;
+  const modal = document.getElementById('photoModal');
+  const preview = document.getElementById('photoPreview');
+  const photo = db.photos[name];
+  
+  if (photo) {
+    preview.innerHTML = '<img src="' + photo + '" style="width:100%;height:100%;object-fit:cover;">';
+  } else {
+    preview.textContent = '📸';
+  }
+  
+  modal.classList.add('active');
+}
+
+function closePhotoModal() {
+  document.getElementById('photoModal').classList.remove('active');
+  currentPhotoMember = '';
+}
+
+function selectPhoto() {
+  document.getElementById('photoInput').click();
+}
+
+function handlePhotoSelect() {
+  const file = document.getElementById('photoInput').files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    db.photos[currentPhotoMember] = e.target.result;
+    localStorage.setItem(KEY, JSON.stringify(db));
+    closePhotoModal();
+    render();
+  };
+  reader.readAsDataURL(file);
+  document.getElementById('photoInput').value = '';
+}
+
+function deletePhoto() {
+  delete db.photos[currentPhotoMember];
+  localStorage.setItem(KEY, JSON.stringify(db));
+  closePhotoModal();
+  render();
+}
+
+function backup() {
+  const data = {
+    app: '우리가족 배당금',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    members: db.members,
+    photos: db.photos,
+    data: db.data
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const d = new Date();
+  a.href = url;
+  a.download = '우리집_배당금_백업_' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function restore() {
+  document.getElementById('restoreFile').click();
+}
+
+function handleRestore() {
+  const file = document.getElementById('restoreFile').files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!Array.isArray(data.members)) throw new Error();
+      if (confirm('데이터를 복원하시겠어요?')) {
+        db = {
+          members: data.members,
+          photos: data.photos || {},
+          data: data.data || {}
+        };
+        localStorage.setItem(KEY, JSON.stringify(db));
+        render();
+        alert('✅ 복원되었습니다!');
+      }
+    } catch (err) {
+      alert('❌ 올바른 파일이 아닙니다');
+    }
+  };
+  reader.readAsText(file);
+  document.getElementById('restoreFile').value = '';
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+init();
+</script>
+
+</body>
+</html>
