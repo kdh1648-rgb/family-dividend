@@ -473,6 +473,16 @@ function render() {
   renderMembers();
   updateStats();
   draw();
+  
+  // 입력 필드에 쉼표 포맷팅 이벤트 추가
+  document.querySelectorAll('.member-amount-input').forEach(input => {
+    input.addEventListener('input', function(e) {
+      let value = this.value.replace(/,/g, '');
+      if (value) {
+        this.value = formatNumber(value);
+      }
+    });
+  });
 }
 
 function renderMembers() {
@@ -487,7 +497,7 @@ function renderMembers() {
         <div class="member-info">
           <div class="member-name">${name}</div>
         </div>
-        <input type="number" class="member-amount-input" id="div-${i}" value="${monthData[name] || 0}" placeholder="0">
+        <input type="text" class="member-amount-input" id="div-${i}" value="${formatNumber(monthData[name] || 0)}" placeholder="0" inputmode="numeric">
         <button class="btn-del" onclick="deleteMember(${i})">×</button>
       </div>
     `;
@@ -587,6 +597,14 @@ function draw() {
       ctx.beginPath();
       ctx.arc(x, y, name === '가족 총액' ? 3.5 : 2.5, 0, Math.PI * 2);
       ctx.fill();
+      
+      // 데이터 레이블 추가 (쉼표 포함)
+      if (v > 0) {
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 10px -apple-system';
+        ctx.textAlign = 'center';
+        ctx.fillText(formatNumber(v), x, y - 10);
+      }
     });
   });
   
@@ -605,7 +623,7 @@ function draw() {
 function save() {
   const monthData = {};
   db.members.forEach((name, i) => {
-    monthData[name] = Number(document.getElementById('div-' + i).value) || 0;
+    monthData[name] = unformatNumber(document.getElementById('div-' + i).value);
   });
   db.data[monthKey(currentYear, currentMonth)] = monthData;
   localStorage.setItem(KEY, JSON.stringify(db));
@@ -620,6 +638,16 @@ function addMember() {
     localStorage.setItem(KEY, JSON.stringify(db));
     render();
   }
+}
+
+// 숫자에 쉼표 추가
+function formatNumber(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+// 쉼표 제거해서 숫자로 변환
+function unformatNumber(str) {
+  return parseInt(str.replace(/,/g, '')) || 0;
 }
 
 function deleteMember(i) {
